@@ -45,30 +45,36 @@ int yywrap() {
 bison.y
 
 %{
-#include "y.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
 %}
 
+%token ID
+
 %%
 
-"="     { printf("\nOperator is EQUAL"); return '='; }
-"+"     { printf("\nOperator is PLUS"); return '+'; }
-"-"     { printf("\nOperator is MINUS"); return '-'; }
-""     { printf("\nOperator is MULTIPLICATION"); return ''; }  
-"/"     { printf("\nOperator is DIVISION"); return '/'; }
+statement:
+      ID '=' E        { printf("\nAssignment expression is valid\n"); }
+    | E               { printf("\nValid arithmetic expression\n"); }
+    ;
 
-[a-zA-Z_][a-zA-Z0-9_]* {
-    printf("\nIdentifier is %s", yytext);
-    return ID;
+E:
+      E '+' ID        { }
+    | E '-' ID        { }
+    | E '*' ID        { }
+    | E '/' ID        { }
+    | ID              { }
+    ;
+
+%%
+
+int main() {
+    printf("Enter an expression:\n");
+    return yyparse();
 }
 
-[ \t]+  ;           // Ignore spaces and tabs
-\n      { return 0; }
-
-.       { return yytext[0]; }
-
-%%
-int yywrap() {
-    return 1;
+void yyerror(char *s) {
+    fprintf(stderr, "Error: %s\n", s);
 }
 ```
 # OUTPUT
